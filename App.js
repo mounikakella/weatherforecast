@@ -23,22 +23,26 @@ export default class App extends React.Component {
 				}&appid=1635890035cbba097fd5c26c8ea672a1`
 			);
 			let responseJson = await response.json();
-			const responseJsonDatesList = await responseJson.list.map(item => {
-				return (item.dt_txt = item.dt_txt.substr(0, 10));
-			});
-			console.log('responseJsonDatesList', responseJsonDatesList);
-			const distinctDates = [...new Set(responseJsonDatesList)];
-			console.log('distinctDates', distinctDates);
-			let uniqueWeatherDates = [];
-			await distinctDates.forEach(date => {
-				uniqueWeatherDates.push(responseJson.list.filter(resList => resList.dt_txt.substr(0, 10) == date)[0]);
-			});
-			console.log('uniqueWeatherDates', uniqueWeatherDates);
+			if (responseJson.cod === '200') {
+				const responseJsonDatesList = await responseJson.list.map(item => {
+					return (item.dt_txt = item.dt_txt.substr(0, 10));
+				});
+				console.log('responseJsonDatesList', responseJsonDatesList);
+				const distinctDates = [...new Set(responseJsonDatesList)];
+				console.log('distinctDates', distinctDates);
+				let uniqueWeatherDates = [];
+				await distinctDates.forEach(date => {
+					uniqueWeatherDates.push(
+						responseJson.list.filter(resList => resList.dt_txt.substr(0, 10) == date)[0]
+					);
+				});
+				console.log('uniqueWeatherDates', uniqueWeatherDates);
+				await this.setState({ uniqueWeatherDates });
+			}
 			await this.setState({
 				weatherData: responseJson,
 				isClicked: true,
 				city: '',
-				uniqueWeatherDates: uniqueWeatherDates,
 			});
 		} catch (error) {
 			console.error(error);
